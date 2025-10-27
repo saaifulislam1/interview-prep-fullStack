@@ -1,34 +1,53 @@
+// components/HookForm
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+// import { zodResolver } from "@hookform/resolvers";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-const ProductForm = () => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(0);
-  const [category, setCategory] = useState("Electronics");
-  const [inStock, setInStock] = useState(true);
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const productData = {
-      name,
-      description,
-      price,
-      category,
-      inStock,
-    };
-    console.log("Submitted to DB", productData);
-  };
+const productSchema = z.object({
+  name: z.string().min(1, "Product name is required"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  price: z
+    .number({ invalid_type_error: "Price must be a number" })
+    .min(0.01, "Price must be positive"),
+  category: z.enum(["TV", "PHONE", "FRIDGE"], {
+    message: "Please select a valid category",
+  }),
+  inStock: z.boolean(),
+});
+
+const HookForm = () => {
   const options = [
     { name: "TV", value: "TV" },
     { name: "PHONE", value: "PHONE" },
     { name: "FRIDGE", value: "FRIDGE" },
   ];
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      description: "",
+      price: 0,
+      category: "Electronics",
+      inStock: true,
+    },
+    resolver: zodResolver(productSchema),
+  });
+  const onFormSubmit = (data) => {
+    console.log(data, "on submit data");
+  };
+
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onFormSubmit)}
       className="w-full max-w-lg p-8 space-y-6 bg-white rounded-lg shadow-md"
     >
-      <h1 className="text-xl">Basic Form</h1>
+      <h1 className="text-xl">Hook Form Used</h1>
       {/* p name */}
       <div>
         <label for="name" className="block text-sm font-medium text-gray-700">
@@ -36,13 +55,13 @@ const ProductForm = () => {
         </label>
         <input
           type="text"
-          name="name"
+          {...register("name")}
           id="name"
           className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          onChange={(e) => {
-            setName(e.target.value);
-          }}
         />
+        {errors.name && (
+          <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+        )}
       </div>
       {/* p description */}
       <div>
@@ -54,13 +73,15 @@ const ProductForm = () => {
         </label>
         <textarea
           name="description"
-          value={description}
           id="description"
-          onChange={(e) => {
-            setDescription(e.target.value);
-          }}
+          {...register("description")}
           className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
         ></textarea>
+        {errors.description && (
+          <p className="mt-1 text-sm text-red-600">
+            {errors.description.message}
+          </p>
+        )}
       </div>
       {/* p price */}
       <div>
@@ -69,9 +90,12 @@ const ProductForm = () => {
         </label>
         <input
           type="number"
-          onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
+          {...register("price", { valueAsNumber: true })}
           className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
         />
+        {errors.price && (
+          <p className="mt-1 text-sm text-red-600">{errors.price.message}</p>
+        )}
       </div>
       {/* p category */}
       <div>
@@ -82,9 +106,8 @@ const ProductForm = () => {
           Category
         </label>
         <select
-          name="category"
           id="category"
-          onChange={(e) => setCategory(e.target.value)}
+          {...register("category")}
           className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
         >
           {options.map((option) => (
@@ -93,6 +116,9 @@ const ProductForm = () => {
             </option>
           ))}
         </select>
+        {errors.category && (
+          <p className="mt-1 text-sm text-red-600">{errors.category.message}</p>
+        )}
       </div>
       {/* p stock */}
       <div>
@@ -103,8 +129,7 @@ const ProductForm = () => {
           type="checkbox"
           id="stock"
           name="stock"
-          checked={inStock}
-          onChange={(e) => setInStock(e.target.checked)}
+          {...register("inStock")}
           className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
         />
       </div>
@@ -120,4 +145,4 @@ const ProductForm = () => {
   );
 };
 
-export default ProductForm;
+export default HookForm;
