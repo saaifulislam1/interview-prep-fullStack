@@ -14,7 +14,11 @@ const productSchema = z.object({
   category: z.enum(["TV", "PHONE", "FRIDGE"], {
     message: "Please select a valid category",
   }),
+  shippingMethod: z.enum(["Standard", "Express"], {
+    message: "Select a shipping method",
+  }),
   inStock: z.boolean(),
+  tags: z.array(z.string()).nonempty("Please select at least one tag"),
 });
 
 const HookForm = () => {
@@ -23,7 +27,8 @@ const HookForm = () => {
     { name: "PHONE", value: "PHONE" },
     { name: "FRIDGE", value: "FRIDGE" },
   ];
-
+  const shippingOptions = ["Standard", "Express"];
+  const tagOptions = ["New", "Featured", "On Sale", "Clearance"];
   const {
     register,
     handleSubmit,
@@ -33,8 +38,10 @@ const HookForm = () => {
       name: "",
       description: "",
       price: 0,
-      category: "Electronics",
+      category: "TV",
       inStock: true,
+      shippingMethod: "Standard",
+      tags: [],
     },
     resolver: zodResolver(productSchema),
   });
@@ -118,6 +125,57 @@ const HookForm = () => {
         </select>
         {errors.category && (
           <p className="mt-1 text-sm text-red-600">{errors.category.message}</p>
+        )}
+      </div>
+      <div>
+        <label for="tags" className="block text-sm font-medium text-gray-700">
+          Category
+        </label>
+      </div>
+
+      <div>
+        <label
+          for="shippingMethod"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Shipping Method
+        </label>
+        <div className="flex items-center mt-2 space-x-4">
+          {shippingOptions.map((method) => (
+            <label key={method} className="flex items-center">
+              <input
+                type="radio"
+                {...register("shippingMethod")}
+                value={method}
+              />
+              <span className="ml-2 text-sm text-gray-700">{method}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label
+          htmlFor="tags"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Tags (Hold Ctrl/Cmd to select multiple)
+        </label>
+        <select
+          id="tags"
+          // Add the `multiple` attribute
+          multiple
+          {...register("tags")}
+          className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 h-24"
+        >
+          {tagOptions.map((tag) => (
+            <option key={tag} value={tag}>
+              {tag}
+            </option>
+          ))}
+        </select>
+        {errors.tags && (
+          <p className="mt-1 text-sm text-red-600">{errors.tags.message}</p>
         )}
       </div>
       {/* p stock */}
