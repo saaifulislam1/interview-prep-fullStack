@@ -2,8 +2,8 @@
 // import { Link, Route, Routes } from "react-router-dom";
 import { Link, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
-import ProductManagement from "./pages/ProductManagement";
-import ProductionForm from "./pages/ProductionForm";
+import BasicFormPage from "./pages/basicFormPage";
+import HookFormPage from "./pages/hookFormPage";
 
 function App() {
   return (
@@ -23,8 +23,8 @@ function App() {
       <main className="w-full mx-auto p-4">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/basic-form" element={<ProductManagement />} />
-          <Route path="/hook-form" element={<ProductionForm />} />
+          <Route path="/basic-form" element={<BasicFormPage />} />
+          <Route path="/hook-form" element={<HookFormPage />} />
         </Routes>
       </main>
     </div>

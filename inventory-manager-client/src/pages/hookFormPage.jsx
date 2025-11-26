@@ -1,6 +1,6 @@
-// pages/ProductionForm.jsx
-import React from "react";
-import HookForm from "../components/HookForm";
+// pages/hookFormPage.jsx
+
+import HookForm from "../components/form/HookForm";
 
 const ProductionForm = () => {
   return (
